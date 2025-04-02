@@ -1,28 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 
-const WalletBalance = ({ balance, addIncome }) => {
-  const [income, setIncome] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!income || income <= 0) return;
-    addIncome(Number(income));
-    setIncome("");
+const WalletBalance = ({ balance, setBalance }) => {
+  const handleAddIncome = () => {
+    const income = parseFloat(prompt("Enter income amount:"));
+    if (!isNaN(income) && income > 0) {
+      setBalance(prevBalance => prevBalance + income);
+    }
   };
 
   return (
-    <div>
-      <h2>Wallet Balance: ${balance}</h2>
-      <button type="button" onClick={() => document.getElementById("incomeForm").style.display = "block"}>
-        + Add Income
-      </button>
-      <form id="incomeForm" style={{ display: "none" }} onSubmit={handleSubmit}>
-        <input type="number" placeholder="Income Amount" value={income} onChange={(e) => setIncome(e.target.value)} />
-        <button type="submit">Add Balance</button>
-      </form>
+    <div className="wallet-balance-container">
+      <h2>Wallet Balance: ${balance.toFixed(2)}</h2>
+      <button className="add-income-btn" onClick={handleAddIncome}>+ Add Income</button>
     </div>
   );
 };
 
 export default WalletBalance;
-// This component displays the wallet balance and allows the user to add income.
+// This component displays the wallet balance and provides a button to add income.

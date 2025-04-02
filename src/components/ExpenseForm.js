@@ -1,37 +1,53 @@
 import React, { useState } from "react";
-import Modal from "react-modal";
 
-const ExpenseForm = ({ addExpense }) => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [expense, setExpense] = useState({ title: "", price: "", category: "", date: "" });
+const ExpenseForm = ({ balance, setBalance, setExpenses, expenses }) => {
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
+  const [date, setDate] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!expense.title || !expense.price || !expense.category || !expense.date) return;
-    addExpense({ ...expense, id: Date.now(), price: Number(expense.price) });
-    setExpense({ title: "", price: "", category: "", date: "" });
-    setModalIsOpen(false);
+    const amount = parseFloat(price);
+    
+    if (!title || isNaN(amount) || !category || !date) {
+      alert("Please fill all fields correctly.");
+      return;
+    }
+
+    if (amount > balance) {
+      alert("Insufficient balance!");
+      return;
+    }
+
+    const newExpense = { title, price: amount, category, date, id: Date.now() };
+    const updatedExpenses = [...expenses, newExpense];
+
+    setExpenses(updatedExpenses);
+    setBalance(prevBalance => prevBalance - amount);
+
+    // Clear input fields
+    setTitle("");
+    setPrice("");
+    setCategory("");
+    setDate("");
   };
 
   return (
-    <>
-      <button type="button" onClick={() => setModalIsOpen(true)}>+ Add Expense</button>
-      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
-        <form onSubmit={handleSubmit}>
-          <input name="title" value={expense.title} onChange={(e) => setExpense({ ...expense, title: e.target.value })} placeholder="Title" />
-          <input name="price" type="number" value={expense.price} onChange={(e) => setExpense({ ...expense, price: e.target.value })} placeholder="Amount" />
-          <select name="category" value={expense.category} onChange={(e) => setExpense({ ...expense, category: e.target.value })}>
-            <option value="">Select Category</option>
-            <option value="Food">Food</option>
-            <option value="Transport">Transport</option>
-          </select>
-          <input name="date" type="date" value={expense.date} onChange={(e) => setExpense({ ...expense, date: e.target.value })} />
-          <button type="submit">Add Expense</button>
-        </form>
-      </Modal>
-    </>
+    <form className="expense-form" onSubmit={handleSubmit}>
+      <input type="text" name="title" placeholder="Expense Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+      <input type="number" name="price" placeholder="Expense Amount" value={price} onChange={(e) => setPrice(e.target.value)} required />
+      <select name="category" value={category} onChange={(e) => setCategory(e.target.value)} required>
+        <option value="">Select Category</option>
+        <option value="Food">Food</option>
+        <option value="Travel">Travel</option>
+        <option value="Entertainment">Entertainment</option>
+      </select>
+      <input type="date" name="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+      <button type="submit" className="expense-submit-btn">Add Expense</button>
+    </form>
   );
 };
 
 export default ExpenseForm;
-// This component allows the user to add a new expense. It uses a modal for input and validates the form before submission.
+// This component handles the form for adding new expenses.

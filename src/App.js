@@ -1,55 +1,37 @@
 import React, { useState, useEffect } from "react";
+import WalletBalance from "./components/WalletBalance";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseList from "./components/ExpenseList";
-import WalletBalance from "./components/WalletBalance";
-import { SnackbarProvider } from "notistack";
 import ExpenseSummary from "./components/ExpenseSummary";
 import ExpenseTrends from "./components/ExpenseTrends";
+import "./App.css";
 
-function App() {
-  const [walletBalance, setWalletBalance] = useState(
-    Number(localStorage.getItem("walletBalance")) || 5000
-  );
-  const [expenses, setExpenses] = useState(
-    JSON.parse(localStorage.getItem("expenses")) || []
-  );
+const App = () => {
+  const [balance, setBalance] = useState(() => {
+    return parseFloat(localStorage.getItem("walletBalance")) || 5000;
+  });
 
+  const [expenses, setExpenses] = useState(() => {
+    return JSON.parse(localStorage.getItem("expenses")) || [];
+  });
+
+  // Persist data to localStorage whenever balance or expenses change
   useEffect(() => {
-    localStorage.setItem("walletBalance", walletBalance);
+    localStorage.setItem("walletBalance", balance);
     localStorage.setItem("expenses", JSON.stringify(expenses));
-  }, [walletBalance, expenses]);
-
-  const addExpense = (expense) => {
-    if (expense.price > walletBalance) {
-      alert("Insufficient balance!");
-      return;
-    }
-    setExpenses([...expenses, expense]);
-    setWalletBalance(walletBalance - expense.price);
-  };
-
-  const deleteExpense = (id, price) => {
-    setExpenses(expenses.filter((exp) => exp.id !== id));
-    setWalletBalance(walletBalance + price);
-  };
-
-  const addIncome = (amount) => {
-    setWalletBalance(walletBalance + amount);
-  };
+  }, [balance, expenses]);
 
   return (
-    <SnackbarProvider maxSnack={3}>
-      <div className="container">
-        <h1>Expense Tracker</h1>
-        <WalletBalance balance={walletBalance} addIncome={addIncome} />
-        <ExpenseForm addExpense={addExpense} />
-        <ExpenseList expenses={expenses} deleteExpense={deleteExpense} />
-        <ExpenseSummary expenses={expenses} />
-        <ExpenseTrends expenses={expenses} />
-      </div>
-    </SnackbarProvider>
+    <div className="app-container">
+      <h1>Expense Tracker</h1>
+      <WalletBalance balance={balance} setBalance={setBalance} />
+      <ExpenseForm balance={balance} setBalance={setBalance} setExpenses={setExpenses} expenses={expenses} />
+      <ExpenseList expenses={expenses} setExpenses={setExpenses} setBalance={setBalance} />
+      <ExpenseSummary expenses={expenses} />
+      <ExpenseTrends expenses={expenses} />
+    </div>
   );
-}
+};
 
 export default App;
-
+// This code defines the main App component of an expense tracker application.

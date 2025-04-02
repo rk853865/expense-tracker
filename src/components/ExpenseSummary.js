@@ -1,39 +1,31 @@
 import React from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
-
-const COLORS = ["#8884d8", "#82ca9d", "#ffbb28", "#ff8042"];
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
 const ExpenseSummary = ({ expenses }) => {
-  const categoryTotals = expenses.reduce((acc, expense) => {
-    acc[expense.category] = (acc[expense.category] || 0) + expense.price;
+  const categoryTotals = expenses.reduce((acc, { category, price }) => {
+    acc[category] = (acc[category] || 0) + price;
     return acc;
   }, {});
 
-  const data = Object.keys(categoryTotals).map((category, index) => ({
+  const data = Object.keys(categoryTotals).map(category => ({
     name: category,
     value: categoryTotals[category],
-    color: COLORS[index % COLORS.length],
   }));
 
+  const COLORS = ["#FF5733", "#33FF57", "#3357FF"];
+
   return (
-    <div>
+    <div className="chart-container">
       <h2>Expense Summary</h2>
-      {data.length > 0 ? (
-        <PieChart width={300} height={300}>
-          <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#8884d8">
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      ) : (
-        <p>No expenses to show</p>
-      )}
+      <PieChart width={300} height={300}>
+        <Pie data={data} cx="50%" cy="50%" outerRadius={100} fill="#8884d8" dataKey="value">
+          {data.map((_, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+        </Pie>
+        <Tooltip />
+      </PieChart>
     </div>
   );
 };
 
 export default ExpenseSummary;
-// This component displays a pie chart summarizing expenses by category.
+// This component displays a pie chart summarizing expenses by category using Recharts.

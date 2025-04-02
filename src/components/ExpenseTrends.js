@@ -1,36 +1,29 @@
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
 const ExpenseTrends = ({ expenses }) => {
-  const categoryTotals = expenses.reduce((acc, expense) => {
-    acc[expense.category] = (acc[expense.category] || 0) + expense.price;
+  const categoryTotals = expenses.reduce((acc, { category, price }) => {
+    acc[category] = (acc[category] || 0) + price;
     return acc;
   }, {});
 
-  const data = Object.keys(categoryTotals).map((category) => ({
-    category,
-    amount: categoryTotals[category],
+  const data = Object.keys(categoryTotals).map(category => ({
+    name: category,
+    value: categoryTotals[category],
   }));
 
   return (
-    <div>
+    <div className="chart-container">
       <h2>Expense Trends</h2>
-      {data.length > 0 ? (
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
-            <XAxis dataKey="category" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="amount" fill="#82ca9d" />
-          </BarChart>
-        </ResponsiveContainer>
-      ) : (
-        <p>No expense data available</p>
-      )}
+      <BarChart width={300} height={250} data={data}>
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="value" fill="#82ca9d" />
+      </BarChart>
     </div>
   );
 };
 
 export default ExpenseTrends;
-// This component displays a bar chart showing the total expenses per category.
+// This component displays a bar chart summarizing expenses by category using Recharts.
